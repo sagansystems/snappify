@@ -16,14 +16,14 @@ function findExportedEnums(text, fileName) {
   const enumMatches = text.match(enumRegExp);
 
   if (enumMatches) {
-    const enums = enumMatches.map((matchText) => {
-      const enumMatch = (/export enum(.*?){(.*?)}/g).exec(matchText);
+    const enums = enumMatches.map(matchText => {
+      const enumMatch = /export enum(.*?){(.*?)}/g.exec(matchText);
       const enumName = enumMatch[1].trim();
       const enumItems = enumMatch[2].split(',').map(item => item.trim());
 
       return {
         name: enumName,
-        items: enumItems
+        items: enumItems,
       };
     });
 
@@ -37,14 +37,21 @@ function findComponentName(text, fileName) {
   let componentName;
 
   if (statelessComponentMatches) {
-    componentName = statelessComponentMatches[1].trim().split(' ').pop().trim();
+    componentName = statelessComponentMatches[1]
+      .trim()
+      .split(' ')
+      .pop()
+      .trim();
   } else {
-    const componentNameRegExp =
-      /class(.*?)extends(.*?)React.(Component|PureComponent|StatelessComponent)/g;
+    const componentNameRegExp = /class(.*?)extends(.*?)React.(Component|PureComponent|StatelessComponent|FC|FunctionComponent)/g;
     const componentMatches = componentNameRegExp.exec(text);
 
     if (componentMatches) {
-      componentName = componentMatches[1].trim().split(' ').pop().trim();
+      componentName = componentMatches[1]
+        .trim()
+        .split(' ')
+        .pop()
+        .trim();
     }
   }
 
@@ -73,14 +80,12 @@ function findPropsInterface(text, fileName) {
       const types = typeStrings.map(string => {
         const nameAndType = string.trim().split(':');
         const name = nameAndType[0];
-        let type = nameAndType
-          .filter((item, i) => i > 0)
-          .join(':');
+        let type = nameAndType.filter((item, i) => i > 0).join(':');
 
         return {
           name: nameAndType[0].replace(/\?/g, ''),
           type,
-          required: name[name.length - 1] !== '?'
+          required: name[name.length - 1] !== '?',
         };
       });
 
@@ -104,7 +109,7 @@ function prepareTextForParsing(text) {
 
 function parseComponent(fileName) {
   return new Promise((resolve, reject) => {
-    readFile(fileName, (content) => {
+    readFile(fileName, content => {
       const preparedContent = prepareTextForParsing(content);
 
       const name = findComponentName(preparedContent, fileName);
@@ -126,5 +131,5 @@ module.exports = {
   findComponentName,
   findExportedEnums,
   findPropsInterface,
-  parseComponent
+  parseComponent,
 };
