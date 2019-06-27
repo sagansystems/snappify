@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/denisraslov/snappify#readme",
   "dependencies": {
+    "eslint": "^6.0.1",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
